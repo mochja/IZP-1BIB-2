@@ -22,7 +22,7 @@ typedef struct {
 	double alpha, beta, height;
 } params_t;
 
-typedef enum { PARAMETERS_NOT_PARSED_CORRECTLY, TAN_RANGES_NOT_VALID } merror_t;
+typedef enum { PARAMETERS_NOT_PARSED_CORRECTLY, TAN_RANGES_NOT_VALID, NOTHING_TO_DO } merror_t;
 
 int parse_args(int argc, char **argv, params_t *parameters);
 
@@ -43,6 +43,9 @@ int show_error_and_halt(merror_t err_code)
 		break;
 	case TAN_RANGES_NOT_VALID:
 		strcpy(errormsg, "Ranges for --tan are not valid. Please check your parameters.");
+		break;
+	case NOTHING_TO_DO:
+		strcpy(errormsg, "There is nothing to do. See --help for program usage.");
 		break;
 	default:
 		strcpy(errormsg, "Unexpected error. (Custom message for error code %d, was NOT defined.)", err_code);
@@ -72,47 +75,40 @@ int main(int argc, char **argv)
 	}
 	else if (result == 0 || params.show_help) { // parsing skipped - show help
 		// show_help();
+		printf("%s", "Help");
+		return EXIT_SUCCESS;
 	}
 
-	if (params.calculate_tan && (params.tan_range_to > params.tan_range_from || params.tan_range_to > 14 || params.tan_range_from > 14 || params.tan_range_from == 0 || params.tan_range_to == 0))
+	if (params.calculate_tan)
 	{
-		err = TAN_RANGES_NOT_VALID;
+		if (params.tan_range_to > params.tan_range_from || params.tan_range_to > 14 || params.tan_range_from > 14 || params.tan_range_from == 0 || params.tan_range_to == 0)
+		{
+			err = TAN_RANGES_NOT_VALID;
+			return show_error_and_halt(err);
+		}
+
+		double math_tan_result = tan(params.alpha);
+
+		for (unsigned int i = params.tan_range_from; i <= params.tan_range_to; i++)
+		{
+			double taylor_tan_result = taylor_tan(params.alpha, i);
+			double cfrac_tan_result = cfrac_tan(params.alpha, i);
+			printf("%d %e %e %e %e %e\n", i, math_tan_result, taylor_tan_result, absd(math_tan_result - taylor_tan_result), cfrac_tan_result, absd(math_tan_result - cfrac_tan_result));
+		}
+	}
+	else if (params.calculate_distances) {
+		// c/d = tan(a)
+		double d = params.height / cfrac_tan(params.alpha, 10);
+		printf("%.10e\n", d);
+
+		// vyska = v1 + c; tan(b) = v1/d
+		double v = params.height + cfrac_tan(params.beta, 10) * d;
+		printf("%.10e\n", v);
+	}
+	else {
+		err = NOTHING_TO_DO;
 		return show_error_and_halt(err);
 	}
-
-	double x = 1.024;
-	double a = 0.3;
-	double b = 0.9;
-	double c = 1.5;
-
-	double math_tan_result = tan(x);
-
-	for (unsigned int i = 6; i < 11; i++)
-	{
-		double taylor_tan_result = taylor_tan(x, i);
-		double cfrac_tan_result = cfrac_tan(x, i);
-		printf("%d %e %e %e %e %e\n", i, math_tan_result, taylor_tan_result, absd(math_tan_result - taylor_tan_result), cfrac_tan_result, absd(math_tan_result - cfrac_tan_result));
-	}
-
-	// c/d = tan(a)
-	double d = c / cfrac_tan(a, 10);
-	printf("%.10e\n", d);
-
-	// vyska = v1 + c; tan(b) = v1/d
-	double v = c + cfrac_tan(b, 10) * d;
-	printf("%.10e\n", v);
-
-	a = 0.15;
-	b = 1.3;
-	c = 1.7;
-
-	// c/d = tan(a)
-	d = c / cfrac_tan(a, 10);
-	printf("%.10e\n", d);
-
-	// vyska = v1 + c; tan(b) = v1/d
-	v = c + cfrac_tan(b, 10) * d;
-	printf("%.10e\n", v);
 
 	return 0;
 }
