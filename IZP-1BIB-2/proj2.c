@@ -22,37 +22,33 @@ typedef struct {
 	double alpha, beta, height;
 } params_t;
 
+typedef enum { PARAMETERS_NOT_PARSED_CORRECTLY, TAN_RANGES_NOT_VALID } merror_t;
+
+int parse_args(int argc, char **argv, params_t *parameters);
+
+int parse_int(char *str, bool *success);
+double parse_double(char *str, bool *success);
+
 double taylor_tan(double x, unsigned int n);
 double cfrac_tan(double x, unsigned int n);
 
 double absd(double x);
 
-int parse_args(int argc, char **argv, params_t *parameters);
-
-int parse_int(char *str, bool *success)
+int show_error_and_halt(merror_t err_code)
 {
-	char *pEnd;
-	errno = 0;
-
-	long int num = strtol(str, &pEnd, 10);
-	if ((pEnd != str && *pEnd != '\0') || (pEnd == str) || errno == ERANGE) {
-		*success = false;
+	char errormsg[1024];
+	switch (err_code) {
+	case PARAMETERS_NOT_PARSED_CORRECTLY:
+		strcpy(errormsg, "Your username is fucking bad.");
+		break;
+	case TAN_RANGES_NOT_VALID:
+		strcpy(errormsg, "Ranges for --tan are not valid. Please check your parameters.");
+		break;
+	default:
+		strcpy(errormsg, "Unexpected error. (Custom message for error code %d, was NOT defined.)", err_code);
 	}
-
-	return (int)num;
-}
-
-double parse_double(char *str, bool *success)
-{
-	char *pEnd;
-	errno = 0;
-
-	double num = strtod(str, &pEnd, 10);
-	if ((pEnd != str && *pEnd != '\0') || (pEnd == str) || errno == ERANGE) {
-		*success = false;
-	}
-
-	return (double)num;
+	fprintf(stderr, "%s", errormsg);
+	return EXIT_FAILURE;
 }
 
 int main(int argc, char **argv)
@@ -65,13 +61,23 @@ int main(int argc, char **argv)
 	params.set_height = false;
 	params.height = 1.5;
 
+	merror_t err;
+
 	int result = parse_args(argc, argv, &params); // -1 err, 0 skip, 1 ok
-	
+
 	if (result == -1) {
 		// handle args parsing err
+		err = PARAMETERS_NOT_PARSED_CORRECTLY;
+		return show_error_and_halt(err);
 	}
 	else if (result == 0 || params.show_help) { // parsing skipped - show help
 		// show_help();
+	}
+
+	if (params.calculate_tan && (params.tan_range_to > params.tan_range_from || params.tan_range_to > 14 || params.tan_range_from > 14 || params.tan_range_from == 0 || params.tan_range_to == 0))
+	{
+		err = TAN_RANGES_NOT_VALID;
+		return show_error_and_halt(err);
 	}
 
 	double x = 1.024;
@@ -189,4 +195,30 @@ int parse_args(int argc, char **argv, params_t *parameters)
 		}
 	}
 	return 0;
+}
+
+int parse_int(char *str, bool *success)
+{
+	char *pEnd;
+	errno = 0;
+
+	long int num = strtol(str, &pEnd, 10);
+	if ((pEnd != str && *pEnd != '\0') || (pEnd == str) || errno == ERANGE) {
+		*success = false;
+	}
+
+	return (int)num;
+}
+
+double parse_double(char *str, bool *success)
+{
+	char *pEnd;
+	errno = 0;
+
+	double num = strtod(str, &pEnd, 10);
+	if ((pEnd != str && *pEnd != '\0') || (pEnd == str) || errno == ERANGE) {
+		*success = false;
+	}
+
+	return (double)num;
 }
