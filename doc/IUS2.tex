@@ -65,7 +65,7 @@ Taylorov rozvoj by sme dokázali vyjadriť takto:
 \tan(x) = x + \frac{x^3}{3} + \frac{2x^5}{15} + \frac{17x^7}{315} + \frac{62x^9}{2835} + ...
 \end{equation}
 
-Pričom v našom prípade rátame len s prvými 13 členmy Taylorovej rady, a to hlavne z dôvodu veľkosti dátoveho typu \texttt{long unsigned int} ($2^{63}-1$). Maximálny počet iterácii pre spresnenie výsledku je v tomto prípade len 13.
+Pričom v našom prípade rátame len s prvými 13 členmy Taylorovej rady, pre čitateľov \cite{numerators} a menovateľov \cite{denominators}, boli využité overené online zdroje. Maximálny počet iterácii pre spresnenie výsledku je v tomto prípade len 13.
 
 \subsection{Zreťazenie zlomkov} \label{subsec:zlomky}
 Fuknciu tangens pomocou zreťazenia zlomkov, vyjadríme takto:
@@ -169,13 +169,20 @@ Pre výpočet vzdialenosti použivame funkciu \texttt{calculate\_distance} a vý
 Ak v tomto priebehu nastena chyba, (napr. nevalidné hodnoty parametrov) nastavíme hodnotu premennej \texttt{err} a následne zavoláme funkciu \texttt{show\_error\_and\_halt}, ktorá program ukonči s chybovou hláškou.
 
 \chapter{Záver}
-toto je zaver
+Aplikácia vypočíta vzdialenosť a výšku objektu pomocou vytvorenej funkie tangens. Pre výpočet bola použitá metóda zreťazenia zlomkov (viď \ref{subsec:zlomky}), hlavne z dôvodu väčšiej presnosti. Program splňuje všetky požiadavky uvedené v zadaní a taktiež funguje pre všetky testovacie prípady.
+
+Pre naše účeli sme obmedzili veľkosť vstupného úhla na prvý kvadrant, toto obmedzenie by mohli riešiť vyššie verzie programu. Pre aktuálnu činnosť to však nieje potrebné.
+
+Program bol úspešne otestovaný na platformách Linux a Windows 32-bit. Nieje potrebné vytváť akúkoľvek zmenu v kóde pre jeho správnu kompiláciu, avšak je potrebné mať na platforme definované 64-bit číslo (uint64\_t).
+
+\bibliographystyle{plain}
+\bibliography{ius2}
 
 \appendix
 \chapter{Metriky kódu} \label{metriky}
 \paragraph{Počet súborov:} 1 súbor
-\paragraph{Počet riadkov zdrojového textu:} 238 riadkov
-\paragraph{Veľkosť statických dát:} 312B
-\paragraph{Veľkosť spustiteľného súbora:} 9753B  (Ubuntu x86, pri preklade bez ladiacich informácií)
+\paragraph{Počet riadkov zdrojového textu:} 282 riadkov
+\paragraph{Veľkosť statických dát:} 6739B
+\paragraph{Veľkosť spustiteľného súbora:} 11.5kB (Windows 32-bit, pri preklade bez ladiacich informácií)
 
 \end{document}
