@@ -13,6 +13,7 @@
 #include <stdbool.h>
 #include <errno.h>
 #include <string.h>
+#include <stdint.h>
 
 #define MAX_ITERATIONS 14
 #define MAX_ANGLE 1.4
@@ -125,8 +126,8 @@ double taylor_tan(double x, unsigned int n)
 {
 	if (n >= MAX_ITERATIONS) return .0;
 
-	static const double numerator[] = { 1, 1, 2, 17, 62, 1382, 21844, 929569, 6404582, 443861162, 18888466084, 113927491862, 58870668456604 };
-	static const double denominator[] = { 1, 3, 15, 315, 2835, 155925, 6081075, 638512875, 10854718875, 1856156927625, 194896477400625, 49308808782358125, 3698160658676859375 };
+	static const uint64_t numerator[] = { 1, 1, 2, 17, 62, 1382, 21844, 929569, 6404582, 443861162, 18888466084, 113927491862, 58870668456604 };
+	static const uint64_t denominator[] = { 1, 3, 15, 315, 2835, 155925, 6081075, 638512875, 10854718875, 1856156927625, 194896477400625, 49308808782358125, 3698160658676859375 };
 	const double pow2x = x * x;
 
 	double lastTopX = x;
